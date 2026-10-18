@@ -1,0 +1,40 @@
+
+title: Office Application Spawning Suspicious Child Process
+id: 8c2d7a61-1f54-4a7c-9b30-2e7d8f61c405
+status: experimental
+description: Detects selected scripting engines and command interpreters launched directly by Microsoft Office applications.
+author: GARUDA-VAJRA INTELLIGENCE
+date: 2026-10-18
+references:
+    - https://attack.mitre.org/techniques/T1566/
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\WINWORD.EXE'
+            - '\EXCEL.EXE'
+            - '\POWERPNT.EXE'
+    selection_child:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\cmd.exe'
+    condition: selection_parent and selection_child
+falsepositives:
+    - Legitimate Office macros or approved automation
+    - Business workflows that invoke command-line tools
+level: medium
+tags:
+    - attack.initial_access
+    - attack.t1566
+fields:
+    - ParentImage
+    - Image
+    - CommandLine
+    - User
+    - ProcessId
+    - ParentProcessId
